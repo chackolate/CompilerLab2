@@ -66,13 +66,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 34 "infix.y"
+#line 27 "infix.y"
 
 	char name[20];
 	int d;
-	struct var *nPtr;
+	stackNode *nPointer;
+	stack nStack;
 
-#line 76 "infix.tab.h"
+#line 77 "infix.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

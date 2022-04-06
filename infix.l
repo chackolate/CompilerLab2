@@ -90,6 +90,13 @@
 	return '!';
 }
 
+"?"{
+	#ifdef VERBOSE
+	printf("'?':%d\n",lineNum);
+	#endif
+	return '?';
+}
+
 [0-9]+ {
 	#ifdef VERBOSE
 	printf("%s:%d\n", yytext, lineNum);

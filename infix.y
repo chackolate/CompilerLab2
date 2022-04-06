@@ -4,37 +4,34 @@
 	#include <ctype.h>
 	#include <string.h>
 	#include <math.h>
+	#include "stack.h"
 
 	#define VERBOSE
 	int lineNum = 1;
 	int yylex();
 
 	void yyerror(char *ps, ...){
-
+		printf("%s\n",ps);
 	}
 
+	extern FILE *yyin;
+
+	stackNode *head;
+	stack *s;
+
+	int *counter;
 	
 %}
 
 %code {
 
-	struct var{
-		char name[100];
-		int val;
-		struct var *next;
-	} var;
-
-	struct var *head;
-
-	struct var* assignVar(char *name, int val);
-	struct var* findVar(char *name, int val, struct var *var);
-	struct var* newVar(char* name, int val);
 }
 
 %union{
 	char name[20];
 	int d;
-	struct var *nPtr;
+	stackNode *nPointer;
+	stack nStack;
 }
 
 %token <d> NUM
@@ -42,11 +39,10 @@
 %token QUIT
 %right '='
 %token '(' ')'
-%left '+' '-'
-%left '*' '/'
+%left '+' '-' '*' '/'
 %right EXP
-%right '!'
-%type <d> expression factor term
+%right '!' '?'
+%type <nPointer> expression factor exponent term
 %right '\n'
 %start infix
 
@@ -60,7 +56,8 @@ infix : expression '\n' {
 				}
 				| infix '\n'{
 
-				};
+				}
+				;
 expression : expression '+' factor {
 							$$ = $1 + $3;
 						}
@@ -69,7 +66,8 @@ expression : expression '+' factor {
 						}
 						| factor {
 							$$ = $1;
-						};
+						}
+						;
 factor : factor '*' term {
 					$$ = $1 * $3;
 				}
@@ -81,7 +79,8 @@ factor : factor '*' term {
 				}
 				| term {
 					$$ = $1;
-				};
+				}
+				;
 term : NUM{
 				$$ = $1;
 			}
@@ -98,46 +97,10 @@ term : NUM{
 			| TXT '=' expression {
 				struct var *node = assignVar($1,$3);
 				$$ = $3;
-			};
+			}
+			;
 
 %%
-
-struct var* assignVar(char *name, int val){
-	struct var *variable = findVar(name,val,head);
-	variable->val = val;
-	return variable;
-}
-
-struct var* findVar(char *name, int val, struct var *variable){
-	if(strcmp(name, variable->name) == 0){
-		return variable;
-	}
-	else if(variable->next == NULL){
-		variable -> next = newVar(name,val);
-		return variable -> next;
-	}
-	else{
-		return findVar(name,val,variable->next);
-	}
-}
-
-struct var* newVar(char* name, int val){
-	struct var* var = (struct var*)malloc(sizeof(struct var));
-	sscanf(name, "%s", var->name);
-	var->val = val;
-	var->next = NULL;
-	return var;
-}
-
-void freeVars(){
-	struct var *node = head->next;
-	while(node != NULL){
-		struct var *tmp = node->next;
-		free(node);
-		node = tmp;
-	}
-	return;
-}
 
 int main(){
 	head = (struct var*)malloc(sizeof(struct var));

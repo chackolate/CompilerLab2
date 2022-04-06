@@ -74,6 +74,7 @@
 	#include <ctype.h>
 	#include <string.h>
 	#include <math.h>
+	#include "stack.h"
 
 	#define VERBOSE
 	int lineNum = 1;
@@ -85,7 +86,7 @@
 
 	
 
-#line 89 "infix.tab.c"
+#line 90 "infix.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -140,22 +141,14 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Unqualified %code blocks.  */
-#line 19 "infix.y"
+#line 20 "infix.y"
 
 
-	struct var{
-		char name[100];
-		int val;
-		struct var *next;
-	} var;
+	stackNode *head;
+	stack *s;
 
-	struct var *head;
 
-	struct var* assignVar(char *name, int val);
-	struct var* findVar(char *name, int val, struct var *var);
-	struct var* newVar(char* name, int val);
-
-#line 159 "infix.tab.c"
+#line 152 "infix.tab.c"
 
 #ifdef short
 # undef short
@@ -537,8 +530,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    55,    55,    58,    61,    64,    67,    70,    73,    76,
-      79,    82,    85,    88,    91,    95,    98
+       0,    49,    49,    52,    55,    58,    61,    64,    67,    70,
+      73,    76,    79,    82,    85,    89,    92
 };
 #endif
 
@@ -1110,129 +1103,129 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* infix: expression '\n'  */
-#line 55 "infix.y"
+#line 49 "infix.y"
                         {
 					printf("=%d\n",(yyvsp[-1].d));
 				}
-#line 1118 "infix.tab.c"
+#line 1111 "infix.tab.c"
     break;
 
   case 3: /* infix: infix expression '\n'  */
-#line 58 "infix.y"
+#line 52 "infix.y"
                                                        {
 					printf("=%d\n",(yyvsp[-1].d));
 				}
-#line 1126 "infix.tab.c"
+#line 1119 "infix.tab.c"
     break;
 
   case 4: /* infix: infix '\n'  */
-#line 61 "infix.y"
+#line 55 "infix.y"
                                             {
 
 				}
-#line 1134 "infix.tab.c"
+#line 1127 "infix.tab.c"
     break;
 
   case 5: /* expression: expression '+' factor  */
-#line 64 "infix.y"
+#line 58 "infix.y"
                                    {
 							(yyval.d) = (yyvsp[-2].d) + (yyvsp[0].d);
 						}
-#line 1142 "infix.tab.c"
+#line 1135 "infix.tab.c"
     break;
 
   case 6: /* expression: expression '-' factor  */
-#line 67 "infix.y"
+#line 61 "infix.y"
                                                                         {
 							(yyval.d) = (yyvsp[-2].d) - (yyvsp[0].d);
 						}
-#line 1150 "infix.tab.c"
+#line 1143 "infix.tab.c"
     break;
 
   case 7: /* expression: factor  */
-#line 70 "infix.y"
+#line 64 "infix.y"
                                                          {
 							(yyval.d) = (yyvsp[0].d);
 						}
-#line 1158 "infix.tab.c"
+#line 1151 "infix.tab.c"
     break;
 
   case 8: /* factor: factor '*' term  */
-#line 73 "infix.y"
+#line 67 "infix.y"
                          {
 					(yyval.d) = (yyvsp[-2].d) * (yyvsp[0].d);
 				}
-#line 1166 "infix.tab.c"
+#line 1159 "infix.tab.c"
     break;
 
   case 9: /* factor: factor '/' term  */
-#line 76 "infix.y"
+#line 70 "infix.y"
                                                   {
 					(yyval.d) = (yyvsp[-2].d) / (yyvsp[0].d);
 				}
-#line 1174 "infix.tab.c"
+#line 1167 "infix.tab.c"
     break;
 
   case 10: /* factor: factor EXP term  */
-#line 79 "infix.y"
+#line 73 "infix.y"
                                                   {
 					(yyval.d) = pow((yyvsp[-2].d),(yyvsp[0].d));
 				}
-#line 1182 "infix.tab.c"
+#line 1175 "infix.tab.c"
     break;
 
   case 11: /* factor: term  */
-#line 82 "infix.y"
+#line 76 "infix.y"
                                        {
 					(yyval.d) = (yyvsp[0].d);
 				}
-#line 1190 "infix.tab.c"
+#line 1183 "infix.tab.c"
     break;
 
   case 12: /* term: NUM  */
-#line 85 "infix.y"
+#line 79 "infix.y"
           {
 				(yyval.d) = (yyvsp[0].d);
 			}
-#line 1198 "infix.tab.c"
+#line 1191 "infix.tab.c"
     break;
 
   case 13: /* term: '(' expression ')'  */
-#line 88 "infix.y"
+#line 82 "infix.y"
                                              {
 				(yyval.d) = (yyvsp[-1].d);
 			}
-#line 1206 "infix.tab.c"
+#line 1199 "infix.tab.c"
     break;
 
   case 14: /* term: TXT  */
-#line 91 "infix.y"
+#line 85 "infix.y"
                               {
 				struct var *node = findVar((yyvsp[0].name),0,head);
 				(yyval.d) = node->val;
 			}
-#line 1215 "infix.tab.c"
+#line 1208 "infix.tab.c"
     break;
 
   case 15: /* term: '!' term  */
-#line 95 "infix.y"
+#line 89 "infix.y"
                                    {
 				(yyval.d) = ((yyvsp[0].d) == 0) ? 1 : 0;
 			}
-#line 1223 "infix.tab.c"
+#line 1216 "infix.tab.c"
     break;
 
   case 16: /* term: TXT '=' expression  */
-#line 98 "infix.y"
+#line 92 "infix.y"
                                              {
 				struct var *node = assignVar((yyvsp[-2].name),(yyvsp[0].d));
 				(yyval.d) = (yyvsp[0].d);
 			}
-#line 1232 "infix.tab.c"
+#line 1225 "infix.tab.c"
     break;
 
 
-#line 1236 "infix.tab.c"
+#line 1229 "infix.tab.c"
 
       default: break;
     }
@@ -1425,7 +1418,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 103 "infix.y"
+#line 97 "infix.y"
 
 
 struct var* assignVar(char *name, int val){
