@@ -18,6 +18,8 @@ extern FILE *yyin;
 struct stackNode *head;
 struct stack *s;
 
+char usrVars[1000];
+
 int *temp_counter;
 
 void yyerror(char *ps, ...){
@@ -70,7 +72,7 @@ expression :
 							sprintf($$->expression,"=%s;",$3->var.name);
 						};
 						| TXT {
-							struct stackNode *node = getVar((char*)$1,0,head);
+							struct stackNode *node = findVar((char*)$1,0,head,1,usrVars);
 							$$ = createVar(node->var.name,node->var.val);
 						}
 						| expression '+' expression {
@@ -146,7 +148,7 @@ expression :
 
 int main(){
 	temp_counter = (int*)malloc(sizeof(int));
-	*temp_counter = 1;
+	*temp_counter = 0;
 	head = (struct stackNode*)malloc(sizeof(struct stackNode));
 	s = (struct stack*)malloc(sizeof(struct stack));
 	s->head = NULL;
@@ -162,6 +164,8 @@ int main(){
 	printStack(s);
 	/* printf("temps: %d\n",*temp_counter); */
 	/* free(temp_counter); */
+	/* printf("%s\n",usrVars); */
+	task3Main(usrVars,s);
 	fclose(yyin);
 	return 0;
 }

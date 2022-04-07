@@ -88,6 +88,8 @@ extern FILE *yyin;
 struct stackNode *head;
 struct stack *s;
 
+char usrVars[1000];
+
 int *temp_counter;
 
 void yyerror(char *ps, ...){
@@ -95,7 +97,7 @@ void yyerror(char *ps, ...){
 }
 	
 
-#line 99 "infix.tab.c"
+#line 101 "infix.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -149,11 +151,11 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Unqualified %code blocks.  */
-#line 29 "infix.y"
+#line 31 "infix.y"
 
 
 
-#line 157 "infix.tab.c"
+#line 159 "infix.tab.c"
 
 #ifdef short
 # undef short
@@ -535,8 +537,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    53,    53,    54,    58,    60,    64,    67,    72,    76,
-      83,    90,    97,   104,   111,   124
+       0,    55,    55,    56,    60,    62,    66,    69,    74,    78,
+      85,    92,    99,   106,   113,   126
 };
 #endif
 
@@ -1110,49 +1112,49 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* equation: expression  */
-#line 58 "infix.y"
+#line 60 "infix.y"
                                                    { (yyvsp[0].nPointer); }
-#line 1116 "infix.tab.c"
+#line 1118 "infix.tab.c"
     break;
 
   case 5: /* expression: NUM  */
-#line 60 "infix.y"
+#line 62 "infix.y"
                                                     {
 							(yyval.nPointer) = createVar("tmp",(yyvsp[0].d));
 							sprintf((yyval.nPointer)->var.name,"%d",(yyvsp[0].d));
 						}
-#line 1125 "infix.tab.c"
+#line 1127 "infix.tab.c"
     break;
 
   case 6: /* expression: '(' expression ')'  */
-#line 64 "infix.y"
+#line 66 "infix.y"
                                                                      {
 							(yyval.nPointer) = (yyvsp[-1].nPointer);
 						}
-#line 1133 "infix.tab.c"
+#line 1135 "infix.tab.c"
     break;
 
   case 7: /* expression: TXT '=' expression  */
-#line 67 "infix.y"
+#line 69 "infix.y"
                                                                      {
 							struct stackNode *node =  assignVar((yyvsp[-2].text),(yyvsp[0].nPointer)->var.val,head);
 							(yyval.nPointer) = push((yyvsp[-2].text),(yyvsp[0].nPointer)->var.val,s);
 							sprintf((yyval.nPointer)->expression,"=%s;",(yyvsp[0].nPointer)->var.name);
 						}
-#line 1143 "infix.tab.c"
+#line 1145 "infix.tab.c"
     break;
 
   case 8: /* expression: TXT  */
-#line 72 "infix.y"
+#line 74 "infix.y"
                                                       {
-							struct stackNode *node = getVar((char*)(yyvsp[0].text),0,head);
+							struct stackNode *node = findVar((char*)(yyvsp[0].text),0,head,1,usrVars);
 							(yyval.nPointer) = createVar(node->var.name,node->var.val);
 						}
-#line 1152 "infix.tab.c"
+#line 1154 "infix.tab.c"
     break;
 
   case 9: /* expression: expression '+' expression  */
-#line 76 "infix.y"
+#line 78 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val + (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1160,11 +1162,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s+%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1164 "infix.tab.c"
+#line 1166 "infix.tab.c"
     break;
 
   case 10: /* expression: expression '-' expression  */
-#line 83 "infix.y"
+#line 85 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val - (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1172,11 +1174,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s-%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1176 "infix.tab.c"
+#line 1178 "infix.tab.c"
     break;
 
   case 11: /* expression: expression '*' expression  */
-#line 90 "infix.y"
+#line 92 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val * (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1184,11 +1186,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s*%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1188 "infix.tab.c"
+#line 1190 "infix.tab.c"
     break;
 
   case 12: /* expression: expression '/' expression  */
-#line 97 "infix.y"
+#line 99 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val / (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1196,11 +1198,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s/%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1200 "infix.tab.c"
+#line 1202 "infix.tab.c"
     break;
 
   case 13: /* expression: expression EXP expression  */
-#line 104 "infix.y"
+#line 106 "infix.y"
                                                                             {
 							int val = pow((yyvsp[-2].nPointer)->var.val,(yyvsp[0].nPointer)->var.val);
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1208,11 +1210,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s**%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1212 "infix.tab.c"
+#line 1214 "infix.tab.c"
     break;
 
   case 14: /* expression: '!' expression  */
-#line 111 "infix.y"
+#line 113 "infix.y"
                                                                  {
 							int val;
 							if((yyvsp[0].nPointer)->var.val==0){
@@ -1226,11 +1228,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%d;\n",val);
 						}
-#line 1230 "infix.tab.c"
+#line 1232 "infix.tab.c"
     break;
 
   case 15: /* expression: expression '?' expression  */
-#line 124 "infix.y"
+#line 126 "infix.y"
                                                                             {
 							int val = ((yyvsp[-2].nPointer)->var.val == 0) ? 0 : (yyvsp[0].nPointer)->var.val;
 							char exp[1000];
@@ -1251,11 +1253,11 @@ yyreduce:
 							strcat(exp,expEnd);
 							sprintf((yyval.nPointer)->expression, "%s", exp);
 						}
-#line 1255 "infix.tab.c"
+#line 1257 "infix.tab.c"
     break;
 
 
-#line 1259 "infix.tab.c"
+#line 1261 "infix.tab.c"
 
       default: break;
     }
@@ -1448,12 +1450,12 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 145 "infix.y"
+#line 147 "infix.y"
 
 
 int main(){
 	temp_counter = (int*)malloc(sizeof(int));
-	*temp_counter = 1;
+	*temp_counter = 0;
 	head = (struct stackNode*)malloc(sizeof(struct stackNode));
 	s = (struct stack*)malloc(sizeof(struct stack));
 	s->head = NULL;
@@ -1469,6 +1471,8 @@ int main(){
 	printStack(s);
 	/* printf("temps: %d\n",*temp_counter); */
 	/* free(temp_counter); */
+	/* printf("%s\n",usrVars); */
+	task3Main(usrVars,s);
 	fclose(yyin);
 	return 0;
 }
