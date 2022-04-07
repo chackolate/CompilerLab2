@@ -5,36 +5,21 @@
 
 #define VERBOSE
 
-struct stackNode {
-  char *name[100];
-  int val;
-  char exp[500];
-  struct stackNode *next;
-  struct stackNode *prev;
-  int tabCnt;
-  int cond;
-};
-typedef struct stackNode stackNode;
-
-struct stack {
-  stackNode *top;
-  stackNode *bottom;
-  int counter;
-} stack;
-typedef struct stack stack;
-
-stackNode *newNode(char *name,
-                   int val) { // create a new node to be placed on the stack
-  stackNode *node = (stackNode *)malloc(sizeof(stackNode));
+struct stackNode *
+newNode(char *name,
+        int val) { // create a new node to be placed on the stack
+  struct stackNode *node = (struct stackNode *)malloc(sizeof(struct stackNode));
   sprintf(node->name, "%s", name);
   node->val = val;
+  sprintf(node->expression, NULL);
   node->next = NULL;
+  node->prev = NULL;
   node->tabCnt = 0;
   node->cond = 0;
   return node;
 }
 
-stackNode *findNode(char *name, int val, stackNode *node) {
+struct stackNode *findNode(char *name, int val, struct stackNode *node) {
   if (!(strcmp(name, node->name))) { // return current node on match
     return node;
   } else if (node->next == NULL) { // end of node list, create node if not found
@@ -45,13 +30,13 @@ stackNode *findNode(char *name, int val, stackNode *node) {
   }
 }
 
-stackNode *assign(char *name, int val, stackNode *head) {
-  stackNode *variable = findNode(name, val, head);
+struct stackNode *assign(char *name, int val, struct stackNode *head) {
+  struct stackNode *variable = findNode(name, val, head);
   variable->val = val;
   return variable;
 }
 
-stackNode *push(stack *s, stackNode *node) {
+struct stackNode *push(struct stack *s, struct stackNode *node) {
   if (s->counter != 0) {
     s->top->next = node;
   } else {
@@ -63,25 +48,31 @@ stackNode *push(stack *s, stackNode *node) {
   return s->top;
 }
 
-stackNode *pop(stack *s) {
-  stackNode *node = s->top;
+struct stackNode *pushNew(char *name, int val, struct stack *s) {
+  struct stackNode *node = newNode(name, val);
+  return push(s, node);
+}
+
+struct stackNode *pop(struct stack *s) {
+  struct stackNode *node = s->top;
   s->top = s->top->prev;
   s->counter--;
   return node;
 }
 
-void stackPrint(stack *s) {
-  stackNode *tmp = s->bottom;
+void stackPrint(struct stack *s) {
+  printf("printing stack\n");
+  struct stackNode *tmp = s->bottom;
   while (tmp != NULL) {
     for (int i = 0; i < tmp->tabCnt; i++) {
       printf("\t");
     }
     if (tmp->cond) {
-      printf("%s", tmp->exp);
+      printf("%s\n", tmp->expression);
     } else {
-      printf("%s%s", tmp->name, tmp->exp);
+      printf("%s%s\n", tmp->name, tmp->expression);
     }
-    stackNode *tmp2 = tmp->next;
+    struct stackNode *tmp2 = tmp->next;
     free(tmp);
     tmp = tmp2;
   }
@@ -90,15 +81,15 @@ void stackPrint(stack *s) {
   s->counter = 0;
 }
 
-void freeNodes(stackNode *head, stack *s) {
-  stackNode *tmp = head->next;
+void freeNodes(struct stackNode *head, struct stack *s) {
+  struct stackNode *tmp = head->next;
   while (tmp != NULL) {
-    stackNode *tmp2 = tmp->next;
+    struct stackNode *tmp2 = tmp->next;
     free(tmp);
     tmp = tmp2;
   }
   while (s->bottom != NULL) {
-    stackNode *tmp2 = s->bottom->next;
+    struct stackNode *tmp2 = s->bottom->next;
     free(s->bottom);
     s->bottom = tmp2;
   }

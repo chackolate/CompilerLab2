@@ -2,8 +2,9 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "infix.tab.h"
+	// extern int yylval;
 
-	#define VERBOSE
+	// #define VERBOSE
 
 
 	extern int lineNum;
@@ -18,13 +19,6 @@
 [\n] {
 	lineNum++;
 	return '\n';
-}
-
-"quit()" {
-	#ifdef VERBOSE
-	printf("'quit()':%d\n", lineNum);
-	#endif
-	return QUIT;
 }
 
 "=" {
@@ -90,7 +84,7 @@
 	return '!';
 }
 
-"?"{
+"?" {
 	#ifdef VERBOSE
 	printf("'?':%d\n",lineNum);
 	#endif
@@ -105,10 +99,11 @@
 	return NUM;
 }
 
-[a-z][a-zA-Z0-9]* {
+[a-zA-Z][a-zA-z0-9]* {
 	#ifdef VERBOSE
 	printf("'%s':%d\n", yytext, lineNum);
 	#endif
+	yylval.text = strdup(yytext);
 	return TXT;
 }
 

@@ -1,25 +1,28 @@
 %{
 
-	#include <stdio.h>
-	#include <ctype.h>
-	#include <string.h>
-	#include <math.h>
-	#include "stack.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <math.h>
+#include "varNodeStack.h"
 
-	#define VERBOSE
-	int lineNum = 1;
-	int yylex();
+#define VERBOSE
+int lineNum;
+int yylex();
 
-	void yyerror(char *ps, ...){
-		printf("%s\n",ps);
-	}
 
-	extern FILE *yyin;
 
-	stackNode *head;
-	stack *s;
+extern FILE *yyin;
 
-	int *counter;
+struct stackNode *head;
+struct stack *s;
+
+int *temp_counter;
+
+void yyerror(char *ps, ...){
+	printf("%s\n", ps);
+}
 	
 %}
 
@@ -28,83 +31,137 @@
 }
 
 %union{
-	char name[20];
+	char *text;
 	int d;
-	stackNode *nPointer;
-	stack nStack;
+	struct stackNode *nPointer;
 }
 
 %token <d> NUM
-%token <name> TXT
-%token QUIT
+%token <text> TXT
 %right '='
 %token '(' ')'
 %left '+' '-' '*' '/'
 %right EXP
 %right '!' '?'
-%type <nPointer> expression factor exponent term
+%type <nPointer> expression
 %right '\n'
 %start infix
 
 %%
 
-infix : expression '\n' {
-					printf("=%d\n",$1);
-				}
-				| infix expression '\n'{
-					printf("=%d\n",$2);
-				}
-				| infix '\n'{
-
-				}
-				;
-expression : expression '+' factor {
-							$$ = $1 + $3;
-						}
-						| expression '-' factor {
-							$$ = $1 - $3;
-						}
-						| factor {
-							$$ = $1;
-						}
-						;
-factor : factor '*' term {
-					$$ = $1 * $3;
-				}
-				| factor '/' term {
-					$$ = $1 / $3;
-				}
-				| factor EXP term {
-					$$ = pow($1,$3);
-				}
-				| term {
-					$$ = $1;
-				}
-				;
-term : NUM{
-				$$ = $1;
-			}
-			| '(' expression ')' {
-				$$ = $2;
-			}
-			| TXT {
-				struct var *node = findVar($1,0,head);
-				$$ = node->val;
-			}
-			| '!' term {
-				$$ = ($2 == 0) ? 1 : 0;
-			}
-			| TXT '=' expression {
-				struct var *node = assignVar($1,$3);
-				$$ = $3;
-			}
+infix : 
+			infix equation '\n'
+			|
 			;
 
+equation : 
+					expression { $1; }
+expression : 
+						NUM {
+							$$ = createVar("tmp",$1);
+							sprintf($$->var.name,"%d",$1);
+						}
+						| '(' expression ')' {
+							$$ = $2;
+						}
+						| TXT '=' expression {
+							struct stackNode *node =  assignVar($1,$3->var.val,head);
+							$$ = push($1,$3->var.val,s);
+							sprintf($$->expression,"=%s;",$3->var.name);
+						};
+						| TXT {
+							struct stackNode *node = getVar((char*)$1,0,head);
+							$$ = createVar(node->var.name,node->var.val);
+						}
+						| expression '+' expression {
+							int val = $1->var.val + $3->var.val;
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name, "tmp%d", *temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%s+%s;\n",$1->var.name,$3->var.name);
+						}
+						| expression '-' expression {
+							int val = $1->var.val - $3->var.val;
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name,"tmp%d",*temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%s-%s;\n",$1->var.name,$3->var.name);
+						}
+						| expression '*' expression {
+							int val = $1->var.val * $3->var.val;
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name,"tmp%d", *temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%s*%s;\n",$1->var.name,$3->var.name);
+						}
+						| expression '/' expression {
+							int val = $1->var.val / $3->var.val;
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name,"tmp%d",*temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%s/%s;\n",$1->var.name,$3->var.name);
+						}
+						| expression EXP expression {
+							int val = pow($1->var.val,$3->var.val);
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name,"tmp%d",*temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%s**%s;\n",$1->var.name,$3->var.name);
+						}
+						| '!' expression {
+							int val;
+							if($2->var.val==0){
+								val = 1;
+							}
+							else{
+								val = 0;
+							}
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name,"tmp%d",*temp_counter);
+							*temp_counter = *temp_counter + 1;
+							sprintf($$->expression,"=%d;\n",val);
+						}
+						| expression '?' expression {
+							int val = ($1->var.val == 0) ? 0 : $3->var.val;
+							char exp[1000];
+							sprintf(exp,"if(%s){\n",$1->var.name);
+
+							while(s->tail != $1){
+								stackNode *node = pop(s);
+								char exp2[1100];
+								sprintf(exp2,"\t%s%s",node->var.name,node->expression);
+								strcat(exp,exp2);
+							}
+							$$ = push("tmp",val,s);
+							sprintf($$->var.name, "tmp%d", *temp_counter);
+							*temp_counter = *temp_counter + 1;
+
+							char expEnd[1000];
+							sprintf(expEnd,"\t%s=%s;\n} else {\n\t%s=0;\n}\n", $$->var.name,$3->var.name, $$->var.name);
+							strcat(exp,expEnd);
+							sprintf($$->expression, "%s", exp);
+						}
+						;
 %%
 
 int main(){
-	head = (struct var*)malloc(sizeof(struct var));
+	temp_counter = (int*)malloc(sizeof(int));
+	*temp_counter = 1;
+	head = (struct stackNode*)malloc(sizeof(struct stackNode));
+	s = (struct stack*)malloc(sizeof(struct stack));
+	s->head = NULL;
+	s->tail = NULL;
+	s->counter = 0;
+	printf("initialized stack & head\n");
+		yyin = fopen("file.txt","r");
+		if(yyin == NULL){
+			printf("File open error");
+			return 1;
+		}
 	yyparse();
-	freeVars();
+	printStack(s);
+	/* printf("temps: %d\n",*temp_counter); */
+	/* free(temp_counter); */
+	fclose(yyin);
 	return 0;
 }

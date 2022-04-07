@@ -56,8 +56,7 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     NUM = 258,                     /* NUM  */
     TXT = 259,                     /* TXT  */
-    QUIT = 260,                    /* QUIT  */
-    EXP = 261                      /* EXP  */
+    EXP = 260                      /* EXP  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -66,14 +65,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 27 "infix.y"
+#line 33 "infix.y"
 
-	char name[20];
+	char *text;
 	int d;
-	stackNode *nPointer;
-	stack nStack;
+	struct stackNode *nPointer;
 
-#line 77 "infix.tab.h"
+#line 75 "infix.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
