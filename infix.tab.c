@@ -143,8 +143,7 @@ enum yysymbol_kind_t
   YYSYMBOL_15_n_ = 15,                     /* '\n'  */
   YYSYMBOL_YYACCEPT = 16,                  /* $accept  */
   YYSYMBOL_infix = 17,                     /* infix  */
-  YYSYMBOL_equation = 18,                  /* equation  */
-  YYSYMBOL_expression = 19                 /* expression  */
+  YYSYMBOL_expression = 18                 /* expression  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -155,7 +154,7 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 
-#line 159 "infix.tab.c"
+#line 158 "infix.tab.c"
 
 #ifdef short
 # undef short
@@ -478,16 +477,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   46
+#define YYLAST   53
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  16
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  4
+#define YYNNTS  3
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  15
+#define YYNRULES  14
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  27
+#define YYNSTATES  26
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   260
@@ -537,8 +536,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    55,    55,    56,    60,    62,    66,    69,    74,    78,
-      85,    92,    99,   106,   113,   126
+       0,    55,    55,    56,    60,    64,    67,    72,    76,    83,
+      90,    97,   104,   111,   124
 };
 #endif
 
@@ -556,7 +555,7 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "NUM", "TXT", "'='",
   "'('", "')'", "'+'", "'-'", "'*'", "'/'", "EXP", "'!'", "'?'", "'\\n'",
-  "$accept", "infix", "equation", "expression", YY_NULLPTR
+  "$accept", "infix", "expression", YY_NULLPTR
 };
 
 static const char *
@@ -566,7 +565,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-10)
+#define YYPACT_NINF (-13)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -580,9 +579,9 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -10,    14,   -10,   -10,    -3,    18,    18,    -8,    32,    18,
-      25,     1,   -10,    18,    18,    18,    18,    18,    18,    32,
-     -10,    -9,    -9,    -9,    -9,    -9,     1
+     -13,     0,   -13,   -13,    -4,    17,    17,    23,    17,    32,
+     -12,    17,    17,    17,    17,    17,    17,   -13,    39,   -13,
+      -7,    -7,    -7,    -7,    -7,   -12
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -590,21 +589,21 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       3,     0,     1,     5,     8,     0,     0,     0,     4,     0,
-       0,    14,     2,     0,     0,     0,     0,     0,     0,     7,
-       6,     9,    10,    11,    12,    13,    15
+       3,     0,     1,     4,     7,     0,     0,     0,     0,     0,
+      13,     0,     0,     0,     0,     0,     0,     2,     6,     5,
+       8,     9,    10,    11,    12,    14
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -10,   -10,   -10,    -5
+     -13,   -13,     3
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1,     7,     8
+       0,     1,     7
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -612,43 +611,45 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      10,    11,     9,    17,    19,    18,     0,    12,    21,    22,
-      23,    24,    25,    26,     2,    18,     0,     3,     4,     0,
-       5,     3,     4,     0,     5,     0,     0,     6,     0,     0,
-       0,     6,    20,    13,    14,    15,    16,    17,     0,    18,
-      13,    14,    15,    16,    17,     0,    18
+       2,     8,    16,     3,     4,    15,     5,    16,     9,    10,
+       0,    18,     0,     6,    20,    21,    22,    23,    24,    25,
+       3,     4,     0,     5,     0,     0,     0,     0,     0,     0,
+       6,    11,    12,    13,    14,    15,     0,    16,    17,    19,
+      11,    12,    13,    14,    15,     0,    16,    11,    12,    13,
+      14,    15,     0,    16
 };
 
 static const yytype_int8 yycheck[] =
 {
-       5,     6,     5,    12,     9,    14,    -1,    15,    13,    14,
-      15,    16,    17,    18,     0,    14,    -1,     3,     4,    -1,
-       6,     3,     4,    -1,     6,    -1,    -1,    13,    -1,    -1,
-      -1,    13,     7,     8,     9,    10,    11,    12,    -1,    14,
-       8,     9,    10,    11,    12,    -1,    14
+       0,     5,    14,     3,     4,    12,     6,    14,     5,     6,
+      -1,     8,    -1,    13,    11,    12,    13,    14,    15,    16,
+       3,     4,    -1,     6,    -1,    -1,    -1,    -1,    -1,    -1,
+      13,     8,     9,    10,    11,    12,    -1,    14,    15,     7,
+       8,     9,    10,    11,    12,    -1,    14,     8,     9,    10,
+      11,    12,    -1,    14
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    17,     0,     3,     4,     6,    13,    18,    19,     5,
-      19,    19,    15,     8,     9,    10,    11,    12,    14,    19,
-       7,    19,    19,    19,    19,    19,    19
+       0,    17,     0,     3,     4,     6,    13,    18,     5,    18,
+      18,     8,     9,    10,    11,    12,    14,    15,    18,     7,
+      18,    18,    18,    18,    18,    18
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    16,    17,    17,    18,    19,    19,    19,    19,    19,
-      19,    19,    19,    19,    19,    19
+       0,    16,    17,    17,    18,    18,    18,    18,    18,    18,
+      18,    18,    18,    18,    18
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     3,     0,     1,     1,     3,     3,     1,     3,
-       3,     3,     3,     3,     2,     3
+       0,     2,     3,     0,     1,     3,     3,     1,     3,     3,
+       3,     3,     3,     2,     3
 };
 
 
@@ -1111,50 +1112,44 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 4: /* equation: expression  */
+  case 4: /* expression: NUM  */
 #line 60 "infix.y"
-                                                   { (yyvsp[0].nPointer); }
-#line 1118 "infix.tab.c"
-    break;
-
-  case 5: /* expression: NUM  */
-#line 62 "infix.y"
                                                     {
 							(yyval.nPointer) = createVar("tmp",(yyvsp[0].d));
 							sprintf((yyval.nPointer)->var.name,"%d",(yyvsp[0].d));
 						}
-#line 1127 "infix.tab.c"
+#line 1122 "infix.tab.c"
     break;
 
-  case 6: /* expression: '(' expression ')'  */
-#line 66 "infix.y"
+  case 5: /* expression: '(' expression ')'  */
+#line 64 "infix.y"
                                                                      {
 							(yyval.nPointer) = (yyvsp[-1].nPointer);
 						}
-#line 1135 "infix.tab.c"
+#line 1130 "infix.tab.c"
     break;
 
-  case 7: /* expression: TXT '=' expression  */
-#line 69 "infix.y"
+  case 6: /* expression: TXT '=' expression  */
+#line 67 "infix.y"
                                                                      {
 							struct stackNode *node =  assignVar((yyvsp[-2].text),(yyvsp[0].nPointer)->var.val,head);
 							(yyval.nPointer) = push((yyvsp[-2].text),(yyvsp[0].nPointer)->var.val,s);
-							sprintf((yyval.nPointer)->expression,"=%s;",(yyvsp[0].nPointer)->var.name);
+							sprintf((yyval.nPointer)->expression,"=%s;\n",(yyvsp[0].nPointer)->var.name);
 						}
-#line 1145 "infix.tab.c"
+#line 1140 "infix.tab.c"
     break;
 
-  case 8: /* expression: TXT  */
-#line 74 "infix.y"
+  case 7: /* expression: TXT  */
+#line 72 "infix.y"
                                                       {
 							struct stackNode *node = findVar((char*)(yyvsp[0].text),0,head,1,usrVars);
 							(yyval.nPointer) = createVar(node->var.name,node->var.val);
 						}
-#line 1154 "infix.tab.c"
+#line 1149 "infix.tab.c"
     break;
 
-  case 9: /* expression: expression '+' expression  */
-#line 78 "infix.y"
+  case 8: /* expression: expression '+' expression  */
+#line 76 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val + (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1162,11 +1157,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s+%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1166 "infix.tab.c"
+#line 1161 "infix.tab.c"
     break;
 
-  case 10: /* expression: expression '-' expression  */
-#line 85 "infix.y"
+  case 9: /* expression: expression '-' expression  */
+#line 83 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val - (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1174,11 +1169,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s-%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1178 "infix.tab.c"
+#line 1173 "infix.tab.c"
     break;
 
-  case 11: /* expression: expression '*' expression  */
-#line 92 "infix.y"
+  case 10: /* expression: expression '*' expression  */
+#line 90 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val * (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1186,11 +1181,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s*%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1190 "infix.tab.c"
+#line 1185 "infix.tab.c"
     break;
 
-  case 12: /* expression: expression '/' expression  */
-#line 99 "infix.y"
+  case 11: /* expression: expression '/' expression  */
+#line 97 "infix.y"
                                                                             {
 							int val = (yyvsp[-2].nPointer)->var.val / (yyvsp[0].nPointer)->var.val;
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1198,11 +1193,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s/%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1202 "infix.tab.c"
+#line 1197 "infix.tab.c"
     break;
 
-  case 13: /* expression: expression EXP expression  */
-#line 106 "infix.y"
+  case 12: /* expression: expression EXP expression  */
+#line 104 "infix.y"
                                                                             {
 							int val = pow((yyvsp[-2].nPointer)->var.val,(yyvsp[0].nPointer)->var.val);
 							(yyval.nPointer) = push("tmp",val,s);
@@ -1210,11 +1205,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%s**%s;\n",(yyvsp[-2].nPointer)->var.name,(yyvsp[0].nPointer)->var.name);
 						}
-#line 1214 "infix.tab.c"
+#line 1209 "infix.tab.c"
     break;
 
-  case 14: /* expression: '!' expression  */
-#line 113 "infix.y"
+  case 13: /* expression: '!' expression  */
+#line 111 "infix.y"
                                                                  {
 							int val;
 							if((yyvsp[0].nPointer)->var.val==0){
@@ -1228,11 +1223,11 @@ yyreduce:
 							*temp_counter = *temp_counter + 1;
 							sprintf((yyval.nPointer)->expression,"=%d;\n",val);
 						}
-#line 1232 "infix.tab.c"
+#line 1227 "infix.tab.c"
     break;
 
-  case 15: /* expression: expression '?' expression  */
-#line 126 "infix.y"
+  case 14: /* expression: expression '?' expression  */
+#line 124 "infix.y"
                                                                             {
 							int val = ((yyvsp[-2].nPointer)->var.val == 0) ? 0 : (yyvsp[0].nPointer)->var.val;
 							char exp[1000];
@@ -1253,11 +1248,11 @@ yyreduce:
 							strcat(exp,expEnd);
 							sprintf((yyval.nPointer)->expression, "%s", exp);
 						}
-#line 1257 "infix.tab.c"
+#line 1252 "infix.tab.c"
     break;
 
 
-#line 1261 "infix.tab.c"
+#line 1256 "infix.tab.c"
 
       default: break;
     }
@@ -1450,12 +1445,12 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 147 "infix.y"
+#line 145 "infix.y"
 
 
 int main(){
 	temp_counter = (int*)malloc(sizeof(int));
-	*temp_counter = 0;
+	*temp_counter = 1;
 	head = (struct stackNode*)malloc(sizeof(struct stackNode));
 	s = (struct stack*)malloc(sizeof(struct stack));
 	s->head = NULL;
@@ -1468,11 +1463,14 @@ int main(){
 			return 1;
 		}
 	yyparse();
-	printStack(s);
-	/* printf("temps: %d\n",*temp_counter); */
-	/* free(temp_counter); */
-	/* printf("%s\n",usrVars); */
-	task3Main(usrVars,s);
+	
+	/* task1Main(s); */
+
+	task2Main(s);
+
+	/* task3Main(usrVars,s); */
+
+
 	fclose(yyin);
 	return 0;
 }

@@ -52,12 +52,10 @@ void yyerror(char *ps, ...){
 %%
 
 infix : 
-			infix equation '\n'
+			infix expression '\n'
 			|
 			;
 
-equation : 
-					expression { $1; }
 expression : 
 						NUM {
 							$$ = createVar("tmp",$1);
@@ -69,7 +67,7 @@ expression :
 						| TXT '=' expression {
 							struct stackNode *node =  assignVar($1,$3->var.val,head);
 							$$ = push($1,$3->var.val,s);
-							sprintf($$->expression,"=%s;",$3->var.name);
+							sprintf($$->expression,"=%s;\n",$3->var.name);
 						};
 						| TXT {
 							struct stackNode *node = findVar((char*)$1,0,head,1,usrVars);
@@ -148,7 +146,7 @@ expression :
 
 int main(){
 	temp_counter = (int*)malloc(sizeof(int));
-	*temp_counter = 0;
+	*temp_counter = 1;
 	head = (struct stackNode*)malloc(sizeof(struct stackNode));
 	s = (struct stack*)malloc(sizeof(struct stack));
 	s->head = NULL;
@@ -161,11 +159,14 @@ int main(){
 			return 1;
 		}
 	yyparse();
-	printStack(s);
-	/* printf("temps: %d\n",*temp_counter); */
-	/* free(temp_counter); */
-	/* printf("%s\n",usrVars); */
-	task3Main(usrVars,s);
+	
+	/* task1Main(s); */
+
+	task2Main(s);
+
+	/* task3Main(usrVars,s); */
+
+
 	fclose(yyin);
 	return 0;
 }

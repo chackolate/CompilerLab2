@@ -81,6 +81,81 @@ void printStack(stack *s) {
   }
 }
 
+void task1Main(stack *s) { printStack(s); }
+
+// Task 2
+char *readStack(stack *s) {
+  char *stackAttributes = malloc(sizeof(char) * 500);
+  stackNode *node = s->head;
+  while (node) {
+    char lineBuf[100];
+    if (strstr(node->expression, "if(") == NULL) {
+      sprintf(lineBuf, "%s%s", node->var.name, node->expression);
+    } else {
+      sprintf(lineBuf, "%s", node->expression);
+    }
+    strcat(stackAttributes, lineBuf);
+    // sprintf(lineBuf, "\n");
+    // strcat(stackAttributes, lineBuf);
+    node = node->next;
+  }
+  return stackAttributes;
+}
+
+char **divideStack(stack *s) { // return 2D array of instructions
+  char **instructions = malloc(20 * sizeof(char *));
+  char *stackRead = readStack(s);
+  // printf("%s\n", stackRead);
+
+  char *stackTok = strtok(stackRead, "\n");
+
+  int i = 0;
+  while (stackTok != NULL) {
+    instructions[i] = malloc(20 * sizeof(char));
+    instructions[i] = stackTok;
+    stackTok = strtok(NULL, "\n");
+    i++;
+  }
+
+  // for (i = 0; i < 20; i++) {
+  //   if (instructions[i] != NULL) {
+  //     printf("%s\n", instructions[i]);
+  //   }
+  // }
+
+  // printf("%s\n", stackTok);
+
+  return instructions;
+}
+
+char *findUsrVars(stack *s) {
+  char *vars = malloc(sizeof(char) * 10);
+  stackNode *node = s->head;
+  while (node) {
+    char nameBuf[100];
+    if (strstr(node->var.name, "tmp") == NULL) {
+      sprintf(nameBuf, "%s ", node->var.name);
+      strcat(vars, nameBuf);
+    }
+    node = node->next;
+  }
+  return vars;
+}
+
+void task2Main(stack *s) {
+  char *varsBuf = findUsrVars(s);
+  printf("%s\n", varsBuf);
+
+  stackNode *node = s->head;
+
+  // char *stackRead = readStack(s);
+  // printf("reading stack\n");
+  // printf("%s", stackRead);
+
+  char **instructions = divideStack(s);
+}
+
+// Task 3
 void initVars(stack *s) {
   char vars[1000];
   sprintf(vars, "\tint");
@@ -112,7 +187,7 @@ void initVars(stack *s) {
   printf("\n%s", vars);
 }
 
-void initTmps(stack *s) {
+void printTmps(stack *s) {
   char tmps[1000];
   sprintf(tmps, "\tint");
   stackNode *node = s->head;
@@ -124,7 +199,7 @@ void initTmps(stack *s) {
   }
   if (node != NULL) {
     if (strstr(node->var.name, "tmp") !=
-        NULL) { // if tmp is found in a name, it is a tmp. add to list
+        NULL) { // if tmp is found in a name, add to list
       sprintf(nameBuf, " %s", node->var.name);
       strcat(tmps, nameBuf);
     }
@@ -182,7 +257,7 @@ void task3Main(char *usrVars, stack *s) {
   // initialize variables
   initVars(s);
   // initialize temps
-  initTmps(s);
+  printTmps(s);
   // print user variables
   if (usrVars) {
     char *stringBuf = strtok(usrVars, " ");

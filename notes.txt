@@ -1,0 +1,7 @@
+1. running through each line of output & reading for variables
+Need first time var is used and last time var is used
+Ex: live from 0-1 means start at beginning & stop after one step
+
+2. Check when variables overlap (which ones are live at the same time)
+
+3. Start assigning registers
