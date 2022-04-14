@@ -35,14 +35,25 @@ typedef struct graphNode {
   char **dsts;
   regNodeEdge *edges;
   int numEdges;
+  int regNum;
 } graphNode;
 
-typedef struct regNodeGraph {
-  struct regNode *head;
-  regNodeEdge **edges;
-  int numVars;
-  int numEdges;
-} regNodeGraph;
+typedef struct registerFile {
+  regNode reg;
+  int occupied;
+} registerFile;
+
+// typedef struct regNodeGraph {
+//   struct regNode *head;
+//   regNodeEdge **edges;
+//   int numVars;
+//   int numEdges;
+// } regNodeGraph;
+
+typedef struct nodeGraph {
+  graphNode **nodes; // 2d array of nodes that are put together to form a graph
+  int numNodes;
+} nodeGraph;
 
 // task 1
 struct stackNode *createVar(char *name, int val);
@@ -72,8 +83,11 @@ regNodeEdge *createEdges(regNode *vars, regNodeEdge *edges, int numVars,
                          int *edgeCnt);
 graphNode *createGraphNode(regNode *vars, regNode *src, int numVars,
                            regNodeEdge *edges, int *numEdges);
-regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
-                          int edgeCnts, regNode *vars, int numVars);
+// regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
+//                           int edgeCnts, regNode *vars, int numVars);
+nodeGraph *createGraph(graphNode **nodes, int numNodes);
+void printGraph(nodeGraph *graph, int numVars);
+void assignRegs(regNode *vars, int numVars, int numLines, char **instructions);
 
 // task 3
 void printVars(stack *s);

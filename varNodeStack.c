@@ -225,23 +225,6 @@ void createEdgeArray(regNode var, regNode *vars, int numVars,
   *numEdges = counter;
 }
 
-// void createGraphNode(graphNode *node, regNode *vars, regNode *src, int
-// numVars,
-//                      regNodeEdge *edges, int *numEdges) {
-
-//   createEdgeArray(*src, vars, numVars, edges, numEdges);
-//   node->dsts = (char **)malloc(*numEdges * sizeof(char *));
-//   // // copy destination names into struct
-//   for (int i = 0; i < *numEdges; i++) {
-//     node->dsts[i] = (char *)malloc(10 * sizeof(char));
-//     strcpy(node->dsts[i], edges[i].dst.name);
-//   }
-//   node->src = (char *)malloc(100 * sizeof(char));
-//   strcpy(node->src, src->name);
-//   node->edges = edges;
-//   node->numEdges = *numEdges;
-// }
-
 graphNode *createGraphNode(regNode *vars, regNode *src, int numVars,
                            regNodeEdge *edges, int *numEdges) {
   createEdgeArray(*src, vars, numVars, edges, numEdges);
@@ -264,60 +247,74 @@ void printGraphNode(graphNode *node) {
   printf("\n");
 }
 
-// regNodeEdge *createEdges(regNode *vars, regNodeEdge *edges, int numVars,
-//                          int *edgeCnt) {
-//   // check live connections for selected node and create edge objects
+// regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
+//                           int edgeCnts, regNode *vars, int numVars) {
 
-//   int bound1, bound2;
-//   int counter = 0;
-//   for (int i = 0; i < numVars; i++) {
-//     for (int j = 0; j < numVars; j++) {
-//       if (j != i) {
-//         if (checkLive(vars[i], vars[j], &bound1,
-//                       &bound2)) { // loop through vars to check if nodes
-//                       overlap
-//           edges[counter].src = vars[i];
-//           edges[counter].dst = vars[j];
-//           counter++;
-//         }
-//       }
-//     }
+//   for (int i = 0; i < graph->numEdges; i++) {
 //   }
-//   *edgeCnt = counter - 1;
-//   printf("edge count: %d\n", *edgeCnt);
-//   return edges;
-// } // edges should be combined into a node
+//   graph->edges = edges;
+//   graph->head = vars;
+//   graph->numVars = numVars;
+//   graph->numEdges = edgeCnts;
+//   return graph;
+// }
 
-regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
-                          int edgeCnts, regNode *vars, int numVars) {
-
-  for (int i = 0; i < graph->numEdges; i++) {
-  }
-  graph->edges = edges;
-  graph->head = vars;
-  graph->numVars = numVars;
-  graph->numEdges = edgeCnts;
-  return graph;
+nodeGraph *createGraph(graphNode **nodes, int numNodes) {
+  nodeGraph *graph = (nodeGraph *)malloc(sizeof(nodeGraph));
+  graph->nodes = nodes;
+  graph->numNodes = numNodes;
 }
 
-void printGraph(regNodeGraph *graph,
-                int *edgeCnts) { // print graph by looping through total #
-                                 // of edges and counts per edge group
-  for (int i = 0; i < graph->numVars; i++) {
-    for (int j = 0; j < edgeCnts[i]; j++) {
-      printf("(%s->%s)", graph->edges[i][j].src.name,
-             graph->edges[i][j].dst.name);
+void printGraph(nodeGraph *graph,
+                int numVars) { // print graph by looping through total #
+                               // of edges and counts per edge group
+  for (int i = 0; i < graph->numNodes; i++) {
+    for (int j = 0; j < graph->nodes[i]->numEdges; j++) {
+      printf("(%s->%s)", graph->nodes[i]->src, graph->nodes[i]->dsts[j]);
     }
     printf("\n");
   }
 }
 
-void assignRegs(regNodeGraph *graph, int *edgeCnts, char **vars) {
-  char **regs = (char **)malloc(10 * sizeof(char *));
-  for (int i = 0; i < graph->numVars;
-       i++) { // outer loop: go through groups of edge lists
-    char nameBuf[10];
-    for (int j = 0; j < edgeCnts[i]; j++) { // inner loop
+void assignRegs(
+    regNode *vars, int numVars, int numLines,
+    char **instructions) { // greedy algorithm - step through program &
+                           // assign nodes to registers in order
+  char *currentLine = (char *)malloc(100 * sizeof(char));
+  registerFile *regFile = (registerFile *)malloc(4 * sizeof(registerFile));
+  for (int i = 0; i < 4; i++) {
+    regFile[i].occupied = 0;
+  }
+  int lastReg = 0;
+  regNode *currentVars = (regNode *)malloc(numVars * sizeof(regNode));
+
+  for (int i = 0; i < numVars; i++) {
+    memcpy(&currentVars[i], &vars[i], sizeof(regNode *));
+  }
+  // step 0
+  for (int i = 0; i < numLines; i++) {
+    for (int j = 0; j < numVars; j++) {
+      if (currentVars[j].firstPos >=
+          i) { // encountered first line, allocate register
+        if (!regFile[lastReg].occupied) {
+          regFile[lastReg].reg = currentVars[j];
+          printf("reg%d=%s\n", lastReg, currentVars[j].name);
+          regFile[lastReg].occupied = 1;
+          lastReg++;
+          if (lastReg > 3) {
+            lastReg = 0;
+          }
+        }
+      } else if (currentVars[j].lastPos <=
+                 i) { // encountered last line, clear register
+        for (int x = 0; x < 4; x++) {
+          if (!strcmp(currentVars[j].name, regFile[x].reg.name)) {
+            regFile[x].occupied = 0;
+            printf("reg%d empty\n", x);
+            lastReg = x;
+          }
+        }
+      }
     }
   }
 }
@@ -349,6 +346,9 @@ void task2Main(stack *s) {
   int bound1, bound2;
 
   // analyze liveness and create edge objects
+  for (int i = 0; i < numVars; i++) {
+  }
+
   regNodeEdge **edges = malloc(numVars * sizeof(**edges));
   int edgeCnts[numVars]; // edge counters for each variable
   for (int i = 0; i < numVars; i++) {
@@ -378,18 +378,12 @@ void task2Main(stack *s) {
   }
   printf("created graph nodes\n");
 
-  // use edges to create graph
-  // regNodeGraph *graph = malloc(sizeof(*graph));
-  // int totalEdges = 0;
-  // for (int i = 0; i < numVars; i++) {
-  //   totalEdges = totalEdges + edgeCnts[i];
-  // }
-  // graph->edges = malloc(numVars * sizeof(**edges));
-  // graph = createGraph(graph, edges, totalEdges, vars, numVars);
-  // printGraph(graph, edgeCnts);
+  // create graph out of nodes
+  nodeGraph *graph = createGraph(node, numVars);
+  printGraph(graph, numVars);
 
   // // read graph to assign registers
-  // assignRegs(graph, edgeCnts);
+  assignRegs(vars, numVars, lineCnt, instructions);
 }
 
 // --------------Task 3-----------------
