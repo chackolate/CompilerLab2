@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct var {
@@ -18,14 +19,30 @@ typedef struct stack {
 } stack;
 
 typedef struct regNode {
-  char *name;
-  struct regNode **edges;
-  int numEdges;
-  int firstLine;
-  int lastLine;
-  int regNum;
-
+  char name[100];
+  int firstPos;
+  int lastPos;
+  struct regNode *next;
 } regNode;
+
+typedef struct regNodeEdge {
+  regNode src;
+  regNode dst;
+} regNodeEdge;
+
+typedef struct graphNode {
+  char *src;
+  char **dsts;
+  regNodeEdge *edges;
+  int numEdges;
+} graphNode;
+
+typedef struct regNodeGraph {
+  struct regNode *head;
+  regNodeEdge **edges;
+  int numVars;
+  int numEdges;
+} regNodeGraph;
 
 // task 1
 struct stackNode *createVar(char *name, int val);
@@ -40,12 +57,28 @@ void task1Main(stack *s);
 
 // task 2
 void task2Main(stack *s);
+char **findUsrVars(stack *s, int *size, char **varList);
 char *readStack(stack *s);
-char *findUsrVars(stack *s);
+void divideStack(stack *s, char **instructions, int *size);
+int stackLength(stack *s);
+int findFirstLine(char **instructions, int lineCnt, char *usrVar);
+int findLastLine(char **instructions, int lineCnt, char *usrVar);
+void fillNodes(regNode *vars, char **varsBuf, char **instructions, int lineCnt,
+               int numVars);
+bool checkLive(regNode var1, regNode var2, int *bound1, int *bound2);
+void createEdgeArray(regNode var, regNode *vars, int numVars,
+                     regNodeEdge *edges, int *numEdges);
+regNodeEdge *createEdges(regNode *vars, regNodeEdge *edges, int numVars,
+                         int *edgeCnt);
+graphNode *createGraphNode(regNode *vars, regNode *src, int numVars,
+                           regNodeEdge *edges, int *numEdges);
+regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
+                          int edgeCnts, regNode *vars, int numVars);
 
 // task 3
-void initVars(stack *s);
-void printTmps(stack *s);
-void printStatements(stack *s);
 void printVars(stack *s);
+void printTmps(stack *s);
+void printUsrVars(stack *s, char *usrVars);
+void printStatements(stack *s);
+void reprintVars(stack *s);
 void task3Main(char *usrVars, stack *s);
