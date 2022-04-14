@@ -9,6 +9,7 @@ typedef struct var {
 typedef struct stackNode {
   var var;
   struct stackNode *next;
+  struct stackNode *prev;
   char expression[500];
 } stackNode;
 
@@ -22,7 +23,6 @@ typedef struct regNode {
   char name[100];
   int firstPos;
   int lastPos;
-  struct regNode *next;
 } regNode;
 
 typedef struct regNodeEdge {
@@ -62,6 +62,7 @@ struct stackNode *findVar(char *name, int val, stackNode *node, int rec,
 void recordVar(int rec, char *varList, char *name);
 struct stackNode *assignVar(char *name, int val, stackNode *head);
 struct stackNode *push(char *name, int val, stack *s);
+void pushNode(stackNode *node, stack *s);
 struct stackNode *pop(stack *s);
 void printStack(stack *s);
 void task1Main(stack *s);
@@ -87,7 +88,10 @@ graphNode *createGraphNode(regNode *vars, regNode *src, int numVars,
 //                           int edgeCnts, regNode *vars, int numVars);
 nodeGraph *createGraph(graphNode **nodes, int numNodes);
 void printGraph(nodeGraph *graph, int numVars);
-void assignRegs(regNode *vars, int numVars, int numLines, char **instructions);
+void assignRegs(stack *s, regNode *vars, int numVars);
+bool isInRegs(char *name, registerFile *regs);
+bool storeRegs(registerFile *regs, regNode reg, stack *s);
+bool clearRegs(registerFile *regs, regNode reg, stack *s);
 
 // task 3
 void printVars(stack *s);

@@ -58,6 +58,16 @@ struct stackNode *push(char *name, int val, stack *s) {
   return s->tail;
 }
 
+void pushNode(stackNode *node, stack *s) {
+  if (s->counter != 0) {
+    s->tail->next = node;
+  } else {
+    s->head = node;
+  }
+  s->tail = node;
+  s->counter++;
+}
+
 struct stackNode *pop(stack *s) {
   stackNode *node = s->tail;
   stackNode *node2 = s->head;
@@ -168,7 +178,7 @@ void fillNodes(regNode *vars, char **varsBuf, char **instructions, int lineCnt,
     strcpy(vars[i].name, varsBuf[i]);
     vars[i].firstPos = findFirstLine(instructions, lineCnt, varsBuf[i]);
     vars[i].lastPos = findLastLine(instructions, lineCnt, varsBuf[i]);
-    printf("%s : %d->%d\n", vars[i].name, vars[i].firstPos, vars[i].lastPos);
+    // printf("%s : %d->%d\n", vars[i].name, vars[i].firstPos, vars[i].lastPos);
   }
 }
 
@@ -276,47 +286,110 @@ void printGraph(nodeGraph *graph,
   }
 }
 
-void assignRegs(
-    regNode *vars, int numVars, int numLines,
-    char **instructions) { // greedy algorithm - step through program &
-                           // assign nodes to registers in order
-  char *currentLine = (char *)malloc(100 * sizeof(char));
-  registerFile *regFile = (registerFile *)malloc(4 * sizeof(registerFile));
+void assignRegs(stack *s, regNode *vars,
+                int numVars) { // greedy algorithm - step through program &
+                               // assign nodes to registers in order
+  stackNode *node = s->head;
+  registerFile *regs = (registerFile *)malloc(4 * sizeof(registerFile));
   for (int i = 0; i < 4; i++) {
-    regFile[i].occupied = 0;
+    regs[i].occupied = 0;
   }
   int lastReg = 0;
-  regNode *currentVars = (regNode *)malloc(numVars * sizeof(regNode));
+  // printf("memcpy\n");
+  int lineCnt = 0;
+  // printf("malloc vars\n");
+  int bound1, bound2;
 
-  for (int i = 0; i < numVars; i++) {
-    memcpy(&currentVars[i], &vars[i], sizeof(regNode *));
+  stack *newStack = (stack *)malloc(sizeof(stack));
+  newStack->head = NULL;
+  newStack->tail = NULL;
+  newStack->counter = 0;
+
+  int cnt = 0;
+  stackNode **copies = (stackNode **)malloc(sizeof(stackNode *));
+
+  // keep track of all variables in registers
+  while (node) {
+    // check all live variables at this point
+
+    copies[lineCnt] = (stackNode *)malloc(sizeof(stackNode));
+    strcpy(copies[lineCnt]->var.name, node->var.name);
+    strcpy(copies[lineCnt]->expression, node->expression);
+    pushNode(copies[lineCnt], newStack);
+    lineCnt++;
+    node = node->next;
   }
-  // step 0
-  for (int i = 0; i < numLines; i++) {
-    for (int j = 0; j < numVars; j++) {
-      if (currentVars[j].firstPos >=
-          i) { // encountered first line, allocate register
-        if (!regFile[lastReg].occupied) {
-          regFile[lastReg].reg = currentVars[j];
-          printf("reg%d=%s\n", lastReg, currentVars[j].name);
-          regFile[lastReg].occupied = 1;
-          lastReg++;
-          if (lastReg > 3) {
-            lastReg = 0;
-          }
-        }
-      } else if (currentVars[j].lastPos <=
-                 i) { // encountered last line, clear register
-        for (int x = 0; x < 4; x++) {
-          if (!strcmp(currentVars[j].name, regFile[x].reg.name)) {
-            regFile[x].occupied = 0;
-            printf("reg%d empty\n", x);
-            lastReg = x;
-          }
-        }
+  // printStack(s);
+  printStack(newStack);
+}
+
+int liveAtTimeStep(int lineNum, regNode *regs, int numRegs) {
+  for (int i = 0; i < numRegs; i++) {
+    if (regs[i].firstPos < lineNum && regs[i].lastPos > lineNum) {
+    }
+  }
+}
+
+bool clearRegs(registerFile *regs, regNode reg, stack *s) {
+  bool success = false;
+  if (isInRegs(reg.name, regs)) {
+    for (int i = 0; i < 4; i++) {
+      if (!strcmp(regs[i].reg.name, reg.name)) {
+        regs[i].occupied = 0;
+        success = true;
+        return success;
       }
     }
   }
+  return success;
+}
+
+bool storeRegs(registerFile *regs, regNode reg, stack *s) {
+  bool success = false;
+  stackNode *tmpNode = (stackNode *)malloc(sizeof(stackNode));
+  char tmpName[20];
+  char tmpExpr[100];
+  int bound1, bound2;
+  for (int i = 0; i < 4; i++) {
+    if (!regs[i].occupied) { // basic storage
+      regs[i].reg = reg;
+      regs[i].occupied = 1;
+      success = true;
+      sprintf(tmpName, "reg%d", i);
+      sprintf(tmpExpr, "=%s", reg.name);
+      strcpy(tmpNode->expression, tmpExpr);
+      strcpy(tmpNode->var.name, tmpName);
+      pushNode(tmpNode, s);
+      return success;
+    } else if (!checkLive(
+                   regs[i].reg, reg, &bound1,
+                   &bound2)) { // reg is not live at the same time as registers
+      regs[i].reg = reg;
+      regs[i].occupied = 1;
+      success = true;
+      sprintf(tmpName, "reg%d", i);
+      sprintf(tmpExpr, "=%s", reg.name);
+      strcpy(tmpNode->expression, tmpExpr);
+      strcpy(tmpNode->var.name, tmpName);
+      pushNode(tmpNode, s);
+      return success;
+    }
+  }
+  return success;
+}
+
+bool isInRegs(char *name, registerFile *regs) {
+  bool entered = false;
+  int i = 0;
+  while (entered == false && i < 4) {
+    if (strcmp(name, regs[i].reg.name)) { // if entered name is not found
+
+    } else {
+      entered = true;
+    }
+    i++;
+  }
+  return entered;
 }
 
 void task2Main(stack *s) {
@@ -337,7 +410,7 @@ void task2Main(stack *s) {
   divideStack(s, instructions, &lineCnt);
   printf("%d lines of instructions\n", lineCnt);
   for (int i = 0; i < lineCnt; i++) {
-    printf("%s\n", instructions[i]);
+    // printf("%s\n", instructions[i]);
   }
 
   // create variable nodes with info on their names and first/last lines
@@ -353,20 +426,20 @@ void task2Main(stack *s) {
   int edgeCnts[numVars]; // edge counters for each variable
   for (int i = 0; i < numVars; i++) {
     edges[i] = (regNodeEdge *)malloc(10 * sizeof(regNodeEdge));
-    // createEdgeArray(vars[i], vars, numVars, edges[i], &edgeCnts[i]);
+    createEdgeArray(vars[i], vars, numVars, edges[i], &edgeCnts[i]);
   }
-  // for (int i = 0; i < numVars;
-  //      i++) { // top loop: # of edge arrays = # of variables
-  //   for (int j = 0; j < edgeCnts[i];
-  //        j++) { // bottom loop: each edge array has its own counter
-  //     printf("(%s->%s) ", edges[i][j].src.name, edges[i][j].dst.name);
-  //   }
-  //   printf("\n");
-  // }
+  for (int i = 0; i < numVars;
+       i++) { // top loop: # of edge arrays = # of variables
+    for (int j = 0; j < edgeCnts[i];
+         j++) { // bottom loop: each edge array has its own counter
+      printf("(%s->%s) ", edges[i][j].src.name, edges[i][j].dst.name);
+    }
+    printf("\n");
+  }
   printf("analyzed edges\n");
   graphNode **node = (graphNode **)malloc(
       numVars * sizeof(graphNode *)); // array of graph nodes
-  // createGraphNode(node, vars, vars[0], numVars, edges[0], &edgeCnts[0]);
+  createGraphNode(vars, &vars[0], numVars, edges[0], &edgeCnts[0]);
 
   for (int i = 0; i < numVars;
        i++) { // outer loop: go through every variable and create a graph node
@@ -378,12 +451,12 @@ void task2Main(stack *s) {
   }
   printf("created graph nodes\n");
 
-  // create graph out of nodes
-  nodeGraph *graph = createGraph(node, numVars);
-  printGraph(graph, numVars);
+  // // create graph out of nodes
+  // nodeGraph *graph = createGraph(node, numVars);
+  // printGraph(graph, numVars);
 
-  // // read graph to assign registers
-  assignRegs(vars, numVars, lineCnt, instructions);
+  // assign registers
+  // assignRegs(s, vars, numVars);
 }
 
 // --------------Task 3-----------------
@@ -393,8 +466,8 @@ void printVars(stack *s) {
   stackNode *node = s->head;
   char nameBuf[100];
   while (strstr(node->var.name, "tmp") !=
-         NULL) { // check if first element is temp or var (need to print without
-                 // a comma)
+         NULL) { // check if first element is temp or var (need to print
+                 // without a comma)
     node = node->next;
   }
   if (node) { // first element print with no comma
@@ -424,8 +497,8 @@ void printTmps(stack *s) {
   stackNode *node = s->head;
   char nameBuf[100];
   while (strstr(node->var.name, "tmp") ==
-         NULL) { // check if first element is temp or var (need to print without
-                 // a comma)
+         NULL) { // check if first element is temp or var (need to print
+                 // without a comma)
     node = node->next;
   }
   if (node != NULL) {

@@ -159,14 +159,26 @@ int main(){
 			return 1;
 		}
 	yyparse();
-	
+	fclose(yyin);
 	/* task1Main(s); */
 
+	*temp_counter = 1;
+	s->head = NULL;
+	s->tail = NULL;
+	s->counter = 0;
+	printf("initialized stack & head\n");
+		yyin = fopen("file2.txt","r");
+		if(yyin == NULL){
+			printf("File open error");
+			return 1;
+		}
+	yyparse();
+	fclose(yyin);
 	task2Main(s);
 
 	/* task3Main(usrVars,s); */
 
 
-	fclose(yyin);
+	
 	return 0;
 }
