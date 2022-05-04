@@ -257,18 +257,6 @@ void printGraphNode(graphNode *node) {
   printf("\n");
 }
 
-// regNodeGraph *createGraph(regNodeGraph *graph, regNodeEdge **edges,
-//                           int edgeCnts, regNode *vars, int numVars) {
-
-//   for (int i = 0; i < graph->numEdges; i++) {
-//   }
-//   graph->edges = edges;
-//   graph->head = vars;
-//   graph->numVars = numVars;
-//   graph->numEdges = edgeCnts;
-//   return graph;
-// }
-
 nodeGraph *createGraph(graphNode **nodes, int numNodes) {
   nodeGraph *graph = (nodeGraph *)malloc(sizeof(nodeGraph));
   graph->nodes = nodes;
@@ -432,9 +420,9 @@ void task2Main(stack *s) {
        i++) { // top loop: # of edge arrays = # of variables
     for (int j = 0; j < edgeCnts[i];
          j++) { // bottom loop: each edge array has its own counter
-      printf("(%s->%s) ", edges[i][j].src.name, edges[i][j].dst.name);
+      // printf("(%s->%s) ", edges[i][j].src.name, edges[i][j].dst.name);
     }
-    printf("\n");
+    // printf("\n");
   }
   printf("analyzed edges\n");
   graphNode **node = (graphNode **)malloc(
